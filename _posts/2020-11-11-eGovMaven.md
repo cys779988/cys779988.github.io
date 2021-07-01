@@ -1,0 +1,47 @@
+---
+title:  "maven"
+excerpt: maven
+categories:
+  - eGovFrame
+---
+
+### Mavan 개요
+- 불필요한 설정을 최소화 한다는 개념 아래 Ant와 같은 빌드 기능을 제공할 뿐 아니라 구조화 된 빌드 기능을 통해 learning curve 및 재사용성을 향상시킴
+- 의존성 관리, 라이브러리 관리, 빌드 생명 주기 및 단계 객체 모델을 갖는 프로젝트 관리 도구로 표준화된 빌드 기능 뿐만 아니라 리포팅 및 documentation 생성 기능 등을 제공  
+
+<img src="https://cys779988.github.io/assets/img/spring-35.PNG">  
+
+- 프로젝트 객체 모델(POM) : 메이븐 엔진 내장 + POM.XML 파일에서 선언적으로 제공
+- 의존성 관리 모델 : 로컬 및 remote 저장소를 이용하여 관리
+- 빌드 생명주기와 각 단계 : 잘 정의된 단계들과 빌드 사이클에 따라 플러그인들을 조율
+
+### Maven 디렉토리 구조
+- Best practice 기반으로 정규화된 디렉토리 구조를 제공하고 있으며 모든 소스 파일들은 /src 디렉토리 밑에 빌드 된 output은 /target 디렉토리 밑에 위치함  
+<img src="https://cys779988.github.io/assets/img/spring-36.PNG">  
+
+
+### 빌드 Lifecycle
+- Maven 빌드는 소프트웨어 프로젝트의 핵심적인 빌드 라이프 사이클 개념을 따르고 있으며 빌드부터 artifact의 배포까지의 라이프 사이클을 정의하고 있음
+<img src="https://cys779988.github.io/assets/img/spring-37.PNG">  
+
+### 의존성 관리 메커니즘
+- POM에서 선언적인 dependency 설정으로 빌드 및 배포 시에 필요한 라이브러리들을 관리하고 로컬 및 원격 저장소에서 선언된 라이브러리들을 다운로드 받아 사용  
+<img src="https://cys779988.github.io/assets/img/spring-38.PNG">  
+
+### Maven Repository
+- artifact들의 저장소로 local 및 remote repository로 구성되며 프로젝트는 pom.xml에서 선언한 dependency들을 저장소로부터 불러와서 사용함  
+<img src="https://cys779988.github.io/assets/img/spring-39.PNG">  
+
+### 프로젝트 객체 모델(POM)
+- 프로젝트의 구조와 내용을 설명하고 있으며 pom.xml 파일에 프로젝트 관리 및 빌드에 필요한 환경설정, 의존성 관리 등의 정보들을 기술함  
+<img src="https://cys779988.github.io/assets/img/spring-40.PNG">  
+<img src="https://cys779988.github.io/assets/img/spring-41.PNG">  
+
+### Maven 이클립스 통합 : m2eclipse
+- m2eclipse는 Eclipse IDE에서 Maven을 사용하기 위한 플러그인으로 Maven 프로젝트 생성 뿐 아니라 Maven 빌드와 WTP(Web Tools Project)의 통합 등 다양한 기능 제공  
+<img src="https://cys779988.github.io/assets/img/spring-42.PNG">  
+<img src="https://cys779988.github.io/assets/img/spring-43.PNG">  
+
+- m2eclipse에서 제공하는 메뉴에서 메이븐 설정 및 연동 기능을 호출할 수 있음
+- m2eclipse는 이클립스의 Run As 메뉴에 Maven 기본 생명주기 단계를 추가하여 빌드 편의성을 제공
+
