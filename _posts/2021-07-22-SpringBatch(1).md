@@ -52,4 +52,44 @@ categories:
 
 ## 스프링 배치 구조
 
-<img src="https://cys779988.github.io/assets/img/springbatch(1).PNG">
+<img src="https://cys779988.github.io/assets/img/springbatch-1.PNG">
+
+
+#### Job
+- 스프링 배치를 통해 작성하고 관리할 작업의 최소단위
+- 하나의 Job은 하나 혹은 그 이상의 Step으로 구성
+
+#### Step
+- 읽기 -> 가공 -> 쓰기 의 묶음. 이 묶음을 Chunk Processing 라고 부름
+
+#### Chunk
+- 한 번의 오퍼레이션을 통해 다룰 데이터의 집합. 각 Step은 설정에 정의된 chunk 단위에 따라 데이터를 읽어 들이고, 가공한 후 기록
+- Step의 설정에서 chunk의 크기를 결정
+- 크기의 단위는 데이터베이스의 한 row일 수도 있고, CSV파일의 한 줄일 수도 있다.
+- 데이터베이스 작업을 수반하는 Step이라면 이 chunk를 처리하는 동안 스프링배치는 컴포넌트 간에 계속하여 TX를 전파하고 마지막 처리가 끝나는 시점에 TX를 커밋하거나 롤백
+- Spring Data JAP를 사용해 Step을 구성하는 경우, chunk의 이런 속성은 영속성 컨텍스트의 생성/소멸 주기와도 관련 있으므로 유념해야한다.
+
+#### ItemReader\<Input\>
+- 배치 작업의 대상이 될 데이터를 읽어 들이는 컴포넌트
+- chunk를 통해 정의한 입력 데이터의 타입과 같은 타입의 데이터를 읽어 들이게 구현
+  
+#### ItemProcessor\<Input, Output\>
+- 데이터를 비즈니스 로직에 따라 가공하고, 변경된 데이터를 리턴하는 컴포넌트
+
+#### ItemWriter\<Output\>
+- 추출 및 가공이 완료된 데이터를 정해진 곳에 저장/색인
+
+#### JobInstance
+- 작업의 독립된 실행단위
+- 하나의 JobInstance는 고유한 JobParameter를 갖고, JobParameter는 JobInstance 객체의 동등성을 평가하는 기준이 됨
+- JobInstance에는 기본값으로 UNIQUE 조건이 부여되므로, 원칙적으로 같은 JobParameter를 가진 두개 이상의 JobInstance는 생성될 수 없다.
+
+#### JobExecution
+- 작업의 독립된 실행 단위인 JobInstance에 대한 한 번의 실행 시도
+- 각 Job은 재시작 여부를 결정하는 flag인   ```boolean restartable = false```  을 갖는다.
+- 명시적으로 재시작 가능 옵션을 설정하면 하나의 JobInstance는 여러개의 JobExecution을 가진다.
+
+#### StepExecution
+- Job이 갖고 있던 하나의 Step에 대한 한 번의 실행 시도
+
+#### 
