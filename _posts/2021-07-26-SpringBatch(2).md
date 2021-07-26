@@ -7,6 +7,8 @@ categories:
 
 ## Spring Batch Metadata
 
+<img src="https://cys779988.github.io/assets/img/springbatch-2.PNG">
+
 참조 : https://docs.spring.io/spring-batch/docs/4.3.x/reference/html/schema-appendix.html#metaDataSchema
 
 #### BATCH_JOB_INSTANCE
@@ -32,17 +34,13 @@ Job의 flow(high level)
 - BATCH_JOB_EXECUTION은 자신의 부모 BATCH_JOB_INSTANCE가 성공/실패 했던 모든 내역을 가지고 있음
 - Spring Batch는 동일한 Job Parameter로 성공한 기록이 있을때만 재수행이 안됨
 
-- BATCH_JOB_EXECUTION_PARAMS
   
-Job 파라미터가 저장됨. IDENTIFYING 컬럼은 BATCH_JOB_INSTANCE.JOB_KEY에 포함될지 말지 결정함
-
-- BATCH_JOB_EXECUTION_CONTEXT
+BATCH_JOB_EXECUTION_PARAMS : Job 파라미터가 저장됨. IDENTIFYING 컬럼은 BATCH_JOB_INSTANCE.JOB_KEY에 포함될지 말지 결정함
   
-Job 안에 있는 컴포넌트들(tasklet, step 등)이 정보를 교환해야 할 때 JOB_EXECUTION_CONTEXT를 사용해 정보를 넣거나 빼낼 수 있음. 그런 정보들이 저장된 테이블
+BATCH_JOB_EXECUTION_CONTEXT : Job 안에 있는 컴포넌트들(tasklet, step 등)이 정보를 교환해야 할 때 JOB_EXECUTION_CONTEXT를 사용해 정보를 넣거나 빼낼 수 있음. 그런 정보들이 저장된 테이블
 
 #### BATCH_STEP_EXECUTION
 - Step 실행 내용을 담고 있음. JOB_EXECUTION과 마찬가지로 Step의 실패 + 성공 횟수만큼 row가 생성됨
-- BATCH_STEP_EXECUTION_CONTEXT
   
-Step 안에 있는 컴포넌트들(reader, processor, writer 등)이 정보를 교환할 때 해당 테이블에 저장됨
+BATCH_STEP_EXECUTION_CONTEXT : Step 안에 있는 컴포넌트들(reader, processor, writer 등)이 정보를 교환할 때 해당 테이블에 저장됨
 
