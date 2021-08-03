@@ -217,4 +217,88 @@ public class SkipCheckingListener extends StepExecutionListenerSupport {
   - 다양한 분기 로직 처리의 어려움, ExitStatus를 커스텀하게 고치기 위해서는 Listener를 생성하고 Job Flow에 등록하는 번거로움이 존재함
 - JobExecutionDecider는 Step 들의 flow 속에서 분기만 담당
 
+  
+```java
 
+@Slf4j
+@Configuration
+@RequiredArgsConstructor
+public class DeciderJobConfiguration {
+	private final JobBuilderFactory jobBuilderFactory;
+	private final StepBuilderFactory stepBuilderFactory;
+	
+	@Bean
+	public Job deciderJob() {
+		return jobBuilderFactory.get("deciderJob")
+				.start(startStep())
+				.next(decider())
+				.from(decider())
+					.on("ODD")
+					.to(oddStep())
+				.from(decider())
+					.on("EVEN")
+					.to(evenStep())
+				.end()
+				.build();
+	}
+	
+	@Bean
+	public Step startStep() {
+		return stepBuilderFactory.get("startStep")
+				.tasklet((contribution, chunkContext) -> {
+					log.info(">>>>> Start!");
+					return RepeatStatus.FINISHED;
+				})
+				.build();
+	}
+	
+	@Bean
+	public Step evenStep() {
+		return stepBuilderFactory.get("evenStep")
+				.tasklet((contribution, chunkContext) -> {
+					log.info(">>>>> 짝수");
+					return RepeatStatus.FINISHED;
+				})
+				.build();
+	}
+	
+	@Bean
+	public Step oddStep() {
+		return stepBuilderFactory.get("oddStep")
+				.tasklet((contribution, chunkContext) -> {
+					log.info(">>>>> 홀수");
+					return RepeatStatus.FINISHED;
+				})
+				.build();
+	}
+	
+	@Bean
+	public JobExecutionDecider decider() {
+		return new OddDecider();
+	}
+	
+	public static class OddDecider implements JobExecutionDecider{
+		
+		@Override
+		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+			// TODO Auto-generated method stub
+			Random random = new Random();
+			int randomNum = random.nextInt(50) + 1;
+			log.info("랜덤숫자 : {}", randomNum);
+			
+			if(randomNum % 2 ==0) {
+				return new FlowExecutionStatus("EVEN");
+			}else {
+				return new FlowExecutionStatus("ODD");
+			}
+		}
+	}
+}
+
+```  
+
+-   ```start()```   : Job Flow의 첫번째 Step 시작
+-   ```next()```   :   ```startStep```   이후에   ```decider```  를 실행
+-   ```from()```   : 이벤트 리스너 역할, decider의 상태값을 보고 일치하는 상태라면   ```to()```  에 포함된   ```step```   호출
+- JobExecutionDecider 인터페이스를 구현한 OddDecider에서 랜덤하게 숫자를 생성하여 홀수/짝수에 따라 상태를 반환
+- Step으로 처리하는게 아니기 때문에 ExitStatus가 아닌 FlowExecutionStatus로 상태 관리
