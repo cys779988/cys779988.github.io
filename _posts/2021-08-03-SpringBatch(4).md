@@ -87,4 +87,5 @@ Spring Batch가 Spring 컨테이너를 통해 지정된 Step의 실행시점에 
 	}
 ```  
 
-
+-   ```@JobScope```  는 Job 실행시점에 Bean이 생성됨. 즉, Bean의 생성 시점을 지정된 Scope가 실행되는 시점으로 지연시킴
+- 
