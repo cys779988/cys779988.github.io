@@ -55,19 +55,65 @@ categories:
 <img src="https://cys779988.github.io/assets/img/springbatch-1.PNG">
 
 
+#### JobRepository
+- 배치 실행중 발생하는 정보를 저장하는 저장소
+- Job의 시작 및 종료시간, 실행횟수, 실행결과 등 배치작업과 관련된 메타데이터가 저장됨
+- DataBase방식, Memory방식
+
+#### JobLauncher
+- 배치 작업을 실행시키는 역할 수행
+- Job과 JobParameter를 이용하여 요청된 Batch 작업을 실행 후 JobExecution 반환
+- taskExecutor설정에서 SyncTaskExecutor(default), SimpleAsyncTaskExecutor (동기, 비동기)로 나눠짐
+
+#### Job Runner
+- 외부 실행 모듈과 JobLauncher를 연결해주는 모듈
+- 스프링 배치는 Scheduling 기능을 제공하지 않아 Quartz나 Cron 사용을 권고함
+- Command Line방식
+
+  ``` java CommandLineJobRunner [설정파일명] [job이름] [Job Parameter A=B형태]```  
+- Web 방식
+
+  
+```java
+@RequestMapping(value="/batchRun.do", method=RequestMethod.POST)
+public String batchRun(@RequestParam(value="jobName", required=false) String jobName, 
+                         @RequestParam(value="async", required=false) String async, Model model){
+      try{
+      JobExecution jobExecution = jobLauncher.run(jobRegisty.getJob(jobName), getUniqueJobParameters(jobName));
+      ...
+```  
+
 #### Job
 - 스프링 배치를 통해 작성하고 관리할 작업의 최소단위
 - 하나의 Job은 하나 혹은 그 이상의 Step으로 구성
 
 #### Step
+- 실질적인 배치 처리 내용을 정의하고 있는 객체
+- 하나의 Job에는 최소 1개 이상의 Step이 있어야 함
 - 읽기 -> 가공 -> 쓰기 의 묶음. 이 묶음을 Chunk Processing 라고 부름
+- JobExecution에 대응되는 StepExecution이 존재함
+- Chunk 지향처리 : 데이터를 item 단위로 읽고 처리하고 쓰는 방식(Spring Batch 기본유형)
+- Tasklet 처리 : 단일 테스크나 커스텀한 코드를 수행하기 위한 처리 방법(Tasklet 인터페이스 직접 구현)
 
-#### Chunk
+#### Chunk  
 - 한 번의 오퍼레이션을 통해 다룰 데이터의 집합. 각 Step은 설정에 정의된 chunk 단위에 따라 데이터를 읽어 들이고, 가공한 후 기록
 - Step의 설정에서 chunk의 크기를 결정
 - 크기의 단위는 데이터베이스의 한 row일 수도 있고, CSV파일의 한 줄일 수도 있다.
 - 데이터베이스 작업을 수반하는 Step이라면 이 chunk를 처리하는 동안 스프링배치는 컴포넌트 간에 계속하여 TX를 전파하고 마지막 처리가 끝나는 시점에 TX를 커밋하거나 롤백
 - Spring Data JPA를 사용해 Step을 구성하는 경우, chunk의 이런 속성은 영속성 컨텍스트의 생성/소멸 주기와도 관련 있으므로 유념해야한다.
+
+#### Chunk 지향 처리
+- Spring Batch에서 일반적으로 사용하는 Step 유형
+- 데이터를 일정크기의 Chunk 단위로 데이터를 처리하는 방법
+- 읽기(Read) -> 처리(Processor) -> 쓰기(Writer)의 단계를 거치는 매커니즘
+- 처리할 데이터가 없을때까지 반복해서 실행
+- 지정된 Chunk 단위(commit-interval)만큼 쌓일 때까지 ItemReader, ItemProcessor 과정을 반복수행하고 Chunk 단위만큼 쌓이면 ItemWriter에 일괄 전달하여 저장
+-   ```commit-interval="100"```   지정 후 배치 실행해서 250번째 데이터를 읽고 처리하는 도중 오류 발생시 1~200번 데이터까지만 저장됨
+- 재 실행할경우 실패한 부분(201~)부터 이어서 실행됨(chunk 개수를 바꾸고 재실행해도 실패한 부분부터 이어서 실행)
+
+#### Tasklet 인터페이스 직접 구현
+- 단일 태스크 또는 커스텀한 코드를 수행하기 위한 처리 방법
+- 단순 파일의 복사 및 이동, DB의 프로시저 호출등의 단순한 처리를 메소드 하나로 구현하고 싶을 경우 사용
 
 #### ItemReader\<Input\>
 - 배치 작업의 대상이 될 데이터를 읽어 들이는 컴포넌트
@@ -83,6 +129,12 @@ categories:
 - 작업의 독립된 실행단위
 - 하나의 JobInstance는 고유한 JobParameter를 갖고, JobParameter는 JobInstance 객체의 동등성을 평가하는 기준이 됨
 - JobInstance에는 기본값으로 UNIQUE 조건이 부여되므로, 원칙적으로 같은 JobParameter를 가진 두개 이상의 JobInstance는 생성될 수 없다.
+- JobInstance는 1개, JobExecution은 여러개 생성 될 수 있음
+
+#### JobParameters
+- 하나의 Job에 존재할 수 있는 여러 JobInstance를 구별하기 위한 Parameter 집합
+- Job을 식별하거나 Job에서 참조하는 데이터로 사용
+- JobParamter를 통해 여러 JobInstance 생성 가능
 
 #### JobExecution
 - 작업의 독립된 실행 단위인 JobInstance에 대한 한 번의 실행 시도
