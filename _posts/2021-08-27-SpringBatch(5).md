@@ -1,5 +1,5 @@
 ---
-title:  "spring batch(5) Scope & Job Parameter"
+title:  "spring batch(5) Chunk 지향처리"
 excerpt: spring batch(5)
 categories:
   - spring
