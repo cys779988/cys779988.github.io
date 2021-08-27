@@ -1,6 +1,6 @@
 ---
-title:  "spring batch(4) Scope & Job Parameter"
-excerpt: spring batch(4)
+title:  "spring batch(5) Scope & Job Parameter"
+excerpt: spring batch(5)
 categories:
   - spring
 ---
