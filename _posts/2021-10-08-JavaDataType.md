@@ -89,7 +89,7 @@ public class Square {
 Square s = new Square();
 ```  
 
-## 변수의 스코프와 
+## 변수의 스코프와 라이프타임
 - 변수의 스코프는 그 변수에 접근할 수 있는 범위, 자바 언어는 블록스코프( {} 중괄호 )를 사용한다.
 - 프로그램 상에서 사용되는 변수들은 사용가능한 범위가 존재한다. 해당 범위가 끝나게 되면 메모리에서 해당 변수가 제거되는 것이 변수의 LifeCycle이다.
 - Reference Type의 변수의 라이프 타임은 GC(Garbage Collector)와 관련이 있는데 GC는 가비지 컬렉션 힙 영역에 존재하는 참조 타입 변수의 객체에 대해 동작한다.
@@ -137,7 +137,7 @@ int[] type_5 = new int[]{1, 2, 3, 4, 5};
 #### 타입 추론
 타입추론(Type inference) 이란 값을 보고 컴파일러가 데이터 타입이 무엇인지 추론한다는 것을 의미
   
-```
+```java
 HashMap<String, Object> myMap = new HashMap<>();
 ```  
 
