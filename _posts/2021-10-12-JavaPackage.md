@@ -55,6 +55,7 @@ private | O | X | X | X
 - 컴퓨터 시스템 환경변수 설정을 통해 지정할 수 있다.
 - JVM이 시작될 때 JVM의 클래스 로더는 이 환경변수를 호출한다. 그래서 환경변수에 설정되어 있는 디렉토리가 호출되면 그 디렉토리에 있는 클래스들을 먼저 JVM에 로드한다.
 - CLASSPATH 환경변수에는 필수 클래스들이 위치한 디렉토리를 등록하도록 한다.
+<img src="https://cys779988.github.io/assets/img/java(5).PNG">
 
 #### java runtime에 -classpath 옵션 사용
 -   ```javac <options> <source files>```  
