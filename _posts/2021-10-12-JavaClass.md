@@ -16,7 +16,7 @@ categories:
 - 클래스로부터 만들어진 객체를 클래스의 인스턴스라고 한다.
 
   
-```
+```java
 public static void main(String[] args) {
   MyClass test1 = new MyClass();  // test1: MyClass@798
   MyClass test2 = new MyClass();  // test2: MyClass@799
@@ -36,7 +36,7 @@ public static void main(String[] args) {
 - 슈퍼클래스의 메서드를 동일한 이름으로 서브클래스에서 재작성하는 행위
 
   
-```
+```java
 public Class Parent {
   void print() {
     System.out.println("Parent");
@@ -61,8 +61,34 @@ public Class Child extends Parent {
 - 추상클래스를 상속받는 자식클래스는 반드시 추상 메서드를 재정의(구현) 해야한다.
 
 ## 다이나믹 메서드 디스패치(Dynamic Method Dispatch)
+
 - 정적 디스패치 (Static Dispatch)  :  컴파일 시점에 호출 할 메서드가 결정되는 경우
+
+  
+```java
+// Static Dispatch
+public static void main(String[] args) {
+  B b = new B();
+  C c = new C();
+  b.print();
+  c.print();
+}
+```  
+
 - 동적 디스패치 (Dynamic Dispatch) : 컴파일 시점에서는 어떤 메서드가 실행될지는 모르고 런타임에 어떤 메서드가 실행되는지 결정되는 경우
+
+  
+```java
+// Dynamic Dispatch
+public static void main(String[] args) {
+  A a1 = new B(); // A 추상클래스를 B에서 상속
+  A a2 = new C(); // A 추상클래스를 C에서 상속
+  a1.print();
+  a2.print();
+}
+```  
+
+- a1.print()를 했을 때 컴파일 시점에는 B클래스에서 정의한 print()가 실행될지 알 수 없고 런타임 시점이 되어야 A클래스의 Receiver Parameter를 보고 어떤 method인지 알 수 있다.
 
 ## final
 - 자바에서 상수(constant)로 다른 값을 가질 수 없다.
