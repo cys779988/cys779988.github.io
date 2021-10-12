@@ -13,15 +13,16 @@ categories:
 - 패키지 이름과 위치한 폴더 이름이 같고 패키지 이름은 java로 시작하면 안된다.
 - 모든 클래스에는 정의된 클래스 이름과 패키지 이름이 있다. 이 둘을 합쳐야 완전하게 한 클래스를 표현한다고 할 수 있으며 FQCN(Fully Qualified Class Name)라고 한다.
 
-## 빌트-인 패키지(Built-in Package)
-- 개발자들이 사용할 수 있도록 여러 많은 패키지 및 클래스를 제공
-- 자바에서 java.lang 패키지는 기본적인 것들이기 때문에 import 하지 않아도 자바가 알아서 java.lang 클래스를 불러온다.
-
 ## import 키워드
 - 다른 패키지명에 있는 클래스를 찾지 못할 때 사용
 - 보통 IDE의 단축키를 사용함
+- 빌트-인 패키지는 import하지 않아도 사용가능하다.
 
-#### 접근 제어자(Access Modifier)
+#### 빌트-인 패키지(Built-in Package)
+- 개발자들이 사용할 수 있도록 여러 많은 패키지 및 클래스를 제공
+- 자바에서 java.lang, java.util 패키지는 기본적인 것들이기 때문에 import 하지 않아도 자바가 알아서 java.lang 클래스를 불러온다.
+
+## 접근 제어자(Access Modifier)
 
 이름 | 설명
 ---- | ----
