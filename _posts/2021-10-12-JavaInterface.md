@@ -63,26 +63,25 @@ static int c = 3;
   
 ```java
 public class App {
-    public static void main(String[] args){
+	public static void main(String[] args){
 
-        MyInterface myInterface = new MyInterface() {
-            @Override
-            public void turnOn() {
+		MyInterface myInterface = new MyInterface() {
+		    @Override
+		    public void turnOn() {
 
-            }
+		    }
 
-            @Override
-            public void turnOff() {
+		    @Override
+		    public void turnOff() {
 
-            }
+		    }
 
-            @Override
-            public void setVolume(int volume) {
+		    @Override
+		    public void setVolume(int volume) {
 
-            }
-        };
-
-    }
+		    }
+		};
+	}
 }
 ```  
 
@@ -95,7 +94,7 @@ public class App {
 - 매개변수 타입으로 클래스가 인터페이스를 활용
 
   
-```
+```java
 // good. 인터페이스를 타입으로 사용
 Set<Son> sonSet = new LinkedHashSet<>();
 
@@ -110,7 +109,7 @@ LinkedHashSet<Son> sonSet = new LinkedHashSet<>();
 - 인터페이스간의 상속이 아닌 클래스의 상속에 대해 되짚어 보면, 클래스는 다이아몬드 상속문제로 다중상속이 불가능하다.
 
   
-```
+```java
 public class MyClass implements MyInterface1, MyInterface2, MyInterface3 {
 
 }
@@ -126,19 +125,19 @@ interface MyInterface3 { }
 - (다이아몬드 문제) 충돌하는 default 메소드의 경우에는 직접 오버라이드 해줘야한다.
 
   
-```
+```java
 public class MyClass implements MyInterface {
-  // 인터페이스 내부 메소드를 오버라이딩 하지 않았지만 오류가 발생하지 않는다.
-  public void doSomething() {
-    // 호출해서 사용할 수도 있다.
-    test();
-  }
+	// 인터페이스 내부 메소드를 오버라이딩 하지 않았지만 오류가 발생하지 않는다.
+	public void doSomething() {
+		// 호출해서 사용할 수도 있다.
+		test();
+	}
 }
 
 interface MyInterface {
-  default void test() {
-    System.out.println("Default Method");
-  }
+	default void test() {
+		System.out.println("Default Method");
+	}
 }
 
 ```  
@@ -148,16 +147,16 @@ interface MyInterface {
 - 인스턴스없이 수행할 수 있는 작업을 정의할 수 있다.
 
   
-```
+```java
 public class MyClass implements {
-  // 일반적인 스태틱메서드 사용법과 동일
-  MyInterface.test();
+	// 일반적인 스태틱메서드 사용법과 동일
+	MyInterface.test();
 }
 
 public interface MyInterface {
-    static void test(){
-        System.out.println("Static Method");
-    }
+	static void test(){
+		System.out.println("Static Method");
+	}
 }
 ```  
 
@@ -169,17 +168,17 @@ public interface MyInterface {
 - static이 아닌 private 메서드는 다른 private static 메서드에서 사용할 수 없다.
 
   
-```
+```java
 interface CustomCalculator{
-  default int addNumbers(int... nums){
-    return add(n -> n % 2 != 0, nums);
-  }
+	default int addNumbers(int... nums){
+		return add(n -> n % 2 != 0, nums);
+	}
   
-  private int add(IntPredicate predicate, int... nums){
-    return IntStream.of(nums)
-		    .filter(predicate)
-		    .sum();
-  }
+	private int add(IntPredicate predicate, int... nums){
+		return IntStream.of(nums)
+				.filter(predicate)
+				.sum();
+	}
 }
 ```  
 - 코드의 중복을 피하고 interface에 대한 캡슐화를 유지할 수 있게 되었다.
