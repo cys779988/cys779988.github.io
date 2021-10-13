@@ -144,7 +144,42 @@ interface MyInterface {
 ```  
 
 ## Java 8, static Method
-- 
+- 해당 인터페이스를 구현한 모든 인스턴스, 해당 타입에 관련되어 있는 유틸리티, 헬퍼 메서드를 제공하고 싶을 때 사용
+- 인스턴스없이 수행할 수 있는 작업을 정의할 수 있다.
+
+  
+```
+public class MyClass implements {
+  // 일반적인 스태틱메서드 사용법과 동일
+  MyInterface.test();
+}
+
+public interface MyInterface {
+    static void test(){
+        System.out.println("Static Method");
+    }
+}
+```  
 
 ## Java 9, private Method
-- 
+- 인터페이스에 default method, static method가 생긴 이후, 이러한 메서드들의 로직을 공통화하고, 재사용하기 위해 생긴 메서드
+- private method고 default method, static method와 같이 구현부를 가져야하는 제약을 가진다.
+- 오직 인터페이스 내부에서만 사용할 수 있다.
+- private static 메서드는 다른 static 또는 static이 아닌 메서드에서 사용할 수 있다.
+- static이 아닌 private 메서드는 다른 private static 메서드에서 사용할 수 없다.
+
+  
+```
+interface CustomCalculator{
+  default int addNumbers(int... nums){
+    return add(n -> n % 2 != 0, nums);
+  }
+  
+  private int add(IntPredicate predicate, int... nums){
+    return IntStream.of(nums)
+		    .filter(predicate)
+		    .sum();
+  }
+}
+```  
+- 코드의 중복을 피하고 interface에 대한 캡슐화를 유지할 수 있게 되었다.
