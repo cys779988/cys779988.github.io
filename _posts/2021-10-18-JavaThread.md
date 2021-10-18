@@ -172,7 +172,7 @@ TERMINATED | 쓰레드가 종료된 상태
   
 메서드 | 설명
 ---- | ----
-static void sleep(long millis) <br/> static void sleep(long millis, int nanos) | 지정된 시간동안 쓰레드를 일시정지. 지정한 시간이 지나고 나면, 자동적으로 다시 실행대기 상태가 된다.
+static void sleep(long millis)   static void sleep(long millis, int nanos) | 지정된 시간동안 쓰레드를 일시정지. 지정한 시간이 지나고 나면, 자동적으로 다시 실행대기 상태가 된다.
 void join()   void join(long millis)   void join(long millis, int nanos) | 지정된 시간동안 쓰레드가 실행. join()을 호출한 쓰레드는 그동안 일시정지 상태가 된다. 지정된 시간이 지나거나 작업이 종료되면 join()을 호출한 쓰레드로 다시 돌아와 실행을 계속한다.
 void interrupt() | sleep()이나 join()에 의해 일시정지 상태인 쓰레드를 깨워서 실행대기 상태로 만든다. 해당 쓰레드에서는 InterruptedException이 발생함으로써 일시정지 상태를 벗어나게 된다.
 static void yield() | 실행 중에 자신에게 주어진 실행시간을 다른 쓰레드에게 양보하고 자신은 실행대기 상태가 된다.
@@ -180,5 +180,7 @@ void stop() | 쓰레드를 즉시 종료.
 void suspend() | 쓰레드를 일시정지. resume()을 호출하면 다시 실행대기 상태가 된다.
 void resume() | suspend()에 의해 일시정지 상태에 있는 쓰레드를 실행대기 상태로 만든다.
 
+- stop(), suspend(), resume() 은 쓰레드를 교착상태로 만들기 쉽기 때문에 deprecated 되었다.
 
 
+<img src="https://cys779988.github.io/assets/img/java(7).png">
