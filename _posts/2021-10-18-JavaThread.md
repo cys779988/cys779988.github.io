@@ -371,10 +371,10 @@ public class Thread implements Runnable {
 
 <img src="https://cys779988.github.io/assets/img/java(8).png">
 
-- Thread1 과 Thread2가 모두 자원 A, B가 필요한 상황에서 Thread1은 A에 먼저 접근하고 Thread2는 B에 먼저 접근했다.
-- Thread1과 Thread2는 각각 A와 B의 lock을 가지고 있는 상태
-- Thread1은 B에 접근하기 위해 B의 lock이 풀리기를 대기하고 Thread2는 A에 접근하기 위해 A의 lock이 풀리기를 대기한다.
-- 서로 원하는 리소스가 상대방에게 할당되어 있기 때문에 두 쓰레드는 무한히 대기상태에 있게 되는데, 이를 교착상태라 한다.
+- Process1 과 Process2가 모두 자원 A, B가 필요한 상황에서 Process1은 A에 먼저 접근하고 Process2는 B에 먼저 접근했다.
+- Process1과 Process2는 각각 A와 B의 lock을 가지고 있는 상태
+- Process1은 B에 접근하기 위해 B의 lock이 풀리기를 대기하고 Process2는 A에 접근하기 위해 A의 lock이 풀리기를 대기한다.
+- 서로 원하는 리소스가 상대방에게 할당되어 있기 때문에 두 프로세스는 무한히 대기상태에 있게 되는데, 이를 교착상태라 한다.
 
 교착상태는 한 시스템 내에서 다음의 네 가지 조건이 동시에 성립될 때 발생한다. 아래 네 가지 조건 중 하나라도 성립하지 않도록 만들면 교착상태를 해결할 수 있다.
 
