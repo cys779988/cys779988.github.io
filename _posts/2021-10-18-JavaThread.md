@@ -424,3 +424,25 @@ void notifyAll() | waiting pool에서 대기 중인 모든 쓰레드를 깨운�
 - deposit을 수행하는 쓰레드는 해당 객체의 lock을 얻어 잔고를 채우고 notify() 메서드를 호출하여 waiting pool 에서 대기중인 쓰레드에게 다시 작업을 수행하라고 통보한다.
 - 대기중이던 쓰레드는 다시 락을 얻어 인출 로직을 수행한다.
 
+#### java.util.concurrent.locks
+- JDK 1.5부터 synchronized 외에 java.util.concurrent.locks 패키지의 Lock 클래스들을 사용하여 동기화를 구현
+- synchronized로 동기화를 하면 자동으로 lock이 걸리고 풀리지만 같은 메서드 내에서만 lock을 걸 수 있다는 불편함이 있다. 그럴 때 lock 클래스를 이용한다.
+
+  
+```java
+
+public interface Lock {}
+
+// 읽기에는 공유적이고, 쓰기에는 배타적인 lock
+public class ReentrantLock implements Lock, java.io.Serializable {}
+
+// 재진입이 가능한 lock, 가장 일반적인 배타 lock
+public class ReentrantReadWriteLock implements ReadWriteLock, java.io.Serializable {}
+
+// ReentrantReadWriteLock에 낙관적인 lock의 기능을 추가
+public class StampedLock implements java.io.Serializable {}
+```  
+
+- ReentrantLock : 가장 일반적인 lock. 특정 조건에서 lock을 풀었다가 다시 lock을 걸 수 있다.
+- ReentrantReadWriteLock : 읽기를 위한 lock(ReadLock)과 쓰기를 위한 lock(WriteLock)을 제공. ReentrantLock은 무조건 lock이 있어야만 임계영역의 코드를 수행할 수 있지만, ReentrantReadWriteLock은 읽기 lock이 걸려 있으면, 다른 쓰레드가 읽기 lock을 중복해서 걸고 읽기를 수행할 수 있다. 그러나 읽기 lock이 걸린 상태에서 쓰기 lock은 허용되지않는다. 반대의 경우도 동일하다.
+- StampedLock : lock을 걸거나 해지할 때 Stamp(Long 타입 정수)를 사용하며 ReentrantReadWriteLock에 optimistic reading lock이 추가된 형태. 읽기 lock이 걸려 있으면 쓰기 lock을 얻기 위해서는 읽기 lock이 풀릴 때까지 기다려야 하는데 비해 optimistic reading lock은 쓰기 lock에 의해 바로 풀린다.
