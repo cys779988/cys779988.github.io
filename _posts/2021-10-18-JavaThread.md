@@ -22,7 +22,7 @@ categories:
 
 #### Thread 클래스
   
-```
+```java
   public class Thread implements Runnable {
       private static native void registerNatives();
       static {
@@ -35,7 +35,7 @@ categories:
 
 #### Runnable 인터페이스
   
-```
+```java
   @FunctionalInterface
   public interface Runnable {
 
@@ -46,7 +46,7 @@ categories:
 ## Thread 실행
 
   
-```
+```java
   public class DemoThread extends Thread {
     @Override
     public void run() {
@@ -56,7 +56,7 @@ categories:
 ```  
 
   
-```
+```java
   public class DemoRunnable implements Runnable {
     @Override
     public void run() {
@@ -66,7 +66,7 @@ categories:
 ```  
 
   
-```
+```java
   public class Test {
     public static void main(String[] args) {
       DemoRunnable runnable = new DemoRunnable();
@@ -90,7 +90,7 @@ categories:
 - start() 메서드가 끝날 때까지 기다리지 않고, 다음 작업을 실행한다. 새로운 쓰레드를 시작하므로 run() 메서드가 종료될 때까지 기다리지않는다.
 
   
-```
+```java
   // 동시에 여러 쓰레드 실행
   public class Test {
     public static void main(String[] args) {
@@ -119,7 +119,7 @@ categories:
 - 쓰레드는 사용자 쓰레드와 데몬 쓰레드로 구분되는데 실행중인 사용자 쓰레드가 하나도 없을 때 프로그램이 종료된다.
 
   
-```
+```java
   public class ThreadDemo {
 
       public static void main(String[] args) {
@@ -184,3 +184,243 @@ void resume() | suspend()에 의해 일시정지 상태에 있는 쓰레드를 �
 
 
 <img src="https://cys779988.github.io/assets/img/java(7).png">
+
+#### I/O Blocking
+- 사용자 입력을 받을 때는 사용자 입력이 들어오기 전까지 해당 쓰레드가 일시정지 상태가 된다. 이를 I/O 블로킹이라고 한다.
+- 한 쓰레드 내에서 사용자 입력을 받는 작업과 이와 관련 없는 작업 두 가지 코드를 작성하면, 사용자 입력을 기다리는 동안 다른 작업 또한 중지되기 때문에 CPU의 사용 효율이 떨어진다.
+- 사용자 입력 받는 쓰레드와, 이와 관련 없는 쓰레드를 분리하여 더욱 효율적으로 CPU를 사용할 수 있다.
+
+#### 싱글 쓰레드
+  
+```java
+  public class ThreadDemo {
+    public static void main(String[] args) {
+      String input = JOptionPane.showInputDialog("아무값이나 입력하세요");
+      System.out.println("입력 값은 " + input + " 입니다.");
+
+      for (int i = 10; i > 0; i--) {
+        System.out.println(i);
+
+        try {
+          Thread.sleep(1000);
+        } catch (Exception e) {
+        }
+      }
+    }
+  }
+```  
+
+#### 멀티 쓰레드
+  
+```java
+  public class ThreadDemo {
+    public static void main(String[] args) {
+      Thread t = new Thread(new MyThread());
+      t.start();
+
+      String input = JOptionPane.showInputDialog("아무값이나 입력하세요");
+      System.out.println("입력 값은 " + input + " 입니다.");
+    }
+  }
+
+  class MyThread implements Runnable {
+    @Override
+    public void run() {
+      for (int i = 10; i > 0; i--) {
+        System.out.println(i);
+
+        try {
+          Thread.sleep(1000);
+        } catch (Exception e) {
+        }
+      }
+    }
+  }
+```  
+
+## 쓰레드의 우선순위
+- 쓰레드는 우선순위(priority)라는 멤버변수를 갖고 있다.
+- 각 쓰레드 별로 우선순위를 다르게 설정해줌으로써 어떤 쓰레드에 더 많은 작업 시간을 부여할 것인가를 설정해줄 수 있다.
+- 1~10 사이의 값을 지정해줄 수 있으며 기본값은 5
+
+  
+```java
+public class Thread implements Runnable {
+    
+    public final static int MIN_PRIORITY = 1;
+
+    public final static int NORM_PRIORITY = 5;
+
+    public final static int MAX_PRIORITY = 10;
+    
+    public final void setPriority(int newPriority) {
+        ThreadGroup g;
+        checkAccess();
+        if (newPriority > MAX_PRIORITY || newPriority < MIN_PRIORITY) {
+            throw new IllegalArgumentException();
+        }
+        if((g = getThreadGroup()) != null) {
+            if (newPriority > g.getMaxPriority()) {
+                newPriority = g.getMaxPriority();
+            }
+            setPriority0(priority = newPriority);
+        }
+    }
+    
+    public final int getPriority() {
+        return priority;
+    }
+}
+
+```  
+
+- set Priority 메서드는 쓰레드를 실행하기 전에만 호출할 수 있다.
+- 쓰레드의 우선 순위를 높이면 더 많은 실행 시간과 실행 기회를 부여받을 수 있다. 주의할 점은 이것이 반드시 보장되지 않는다.
+- 쓰레드의 작업할당은 OS의 스케쥴링 정책과 JVM의 구현에 따라 다르기 때문에 코드에서 우선순위를 지정하는 것은 단지 희망사항일 뿐, 실제 작업은 설정한 우선 순위와 다르게 진행할 수 있다.
+
+## 동기화(Synchronization)
+
+#### synchronized
+- 멀티 쓰레드 프로세스에서는 여러 프로세스가 메모리를 공유하기 때문에 한 쓰레드가 작업하던 부분을 다른 쓰레드가 간섭하는 문제가 생길 수 있다.
+- 어떤 쓰레드가 진행 중인 작업을 다른 쓰레드가 간섭하지 못하도록 하는 작업을 동기화라고 한다.
+- 동기화를 하려면 다른 쓰레드가 간섭해서는 안 되는 부분을 synchronized 키워드를 사용하여 임계영역(critical section)으로 설정해 주어야 한다.
+
+  
+```java
+  // 메서드 전체를 임계영역으로 설정
+  public synchronized void method1 () {
+      ......
+  }
+```  
+
+- 쓰레드는 synchronized 키워드가 붙은 메서드가 호출된 시점부터 해당 메서드가 포함된 객체의 lock을 얻어 작업을 수행하다가 메서드가 종료되면 lock을 반환한다.
+
+  
+```java
+  // 특정한 영역을 임계영역으로 설정
+  synchronized(객체의 참조변수) {
+      ......
+  }
+```  
+
+- 참조변수는 락을 걸고자 하는 객체를 참조하는 것이어야 한다.
+- 이 영역으로 들어가면서부터 쓰레드는 지정된 객체의 lock을 얻게되고 블록을 벗어나면 lock을 반납한다.
+
+#### lock
+- lock은 일종의 자물쇠 개념으로 모든 객체는 lock을 하나식 가지고 있다.
+- 해당 객체의 lock을 가지고 있는 쓰레드만 임계영역의 코드를 수행할 수 있다.
+- 한 객체의 lock은 하나밖에 없기 때문에 다른 쓰레드들은 lock을 얻을 때까지 기다리게 된다.
+- 임계영역은 멀티쓰레드 프로그램의 성능을 좌우하기 때문에 가능하면 메서드 전체에 lock을 거는 것보다 synchronized 블록으로 임계영역을 최소화하는 것이 좋다.
+
+  
+```java
+  public class Account {
+    private int balance = 1000;
+
+    public int getBalance() {
+      return balance;
+    }
+
+    public void withdraw(int money) {
+      // 동기화블록
+      synchronized (this) {
+        if(balance >= money) {
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException e) {
+          }
+          balance -= money;
+        }
+      }
+    }
+  }
+```  
+
+- 출금하는 로직에 동기화를 해서 한 쓰레드가 출금로직을 실행하고 있으면 다른 쓰레드가 출금블록에 들어오지 못하도록 막아줌
+
+  
+```java
+  public class ThreadDemo implements Runnable	{
+    Account account = new Account();
+
+    @Override
+    public void run() {
+      // TODO Auto-generated method stub
+      while (account.getBalance() > 0) {
+        int money = (int) (Math.random() * 3 + 1) * 100;
+        account.withdraw(money);
+        System.out.println("balance : " + account.getBalance());
+      }
+    }
+  }
+```  
+
+  
+```java
+  public class Main {
+    public static void main(String[] args) {
+      Runnable r = new ThreadDemo();
+      new Thread(r).start();
+      new Thread(r).start();
+    }
+  }
+```  
+
+#### 교착상태(DeadLock)
+- 교착상태는 한 자원을 여러 시스템이 사용하려고 할 때 발생
+
+<img src="https://cys779988.github.io/assets/img/java(8).png">
+
+- Thread1 과 Thread2가 모두 자원 A, B가 필요한 상황에서 Thread1은 A에 먼저 접근하고 Thread2는 B에 먼저 접근했다.
+- Thread1과 Thread2는 각각 A와 B의 lock을 가지고 있는 상태
+- Thread1은 B에 접근하기 위해 B의 lock이 풀리기를 대기하고 Thread2는 A에 접근하기 위해 A의 lock이 풀리기를 대기한다.
+- 서로 원하는 리소스가 상대방에게 할당되어 있기 때문에 두 쓰레드는 무한히 대기상태에 있게 되는데, 이를 교착상태라 한다.
+
+교착상태는 한 시스템 내에서 다음의 네 가지 조건이 동시에 성립될 때 발생한다. 아래 네 가지 조건 중 하나라도 성립하지 않도록 만들면 교착상태를 해결할 수 있다.
+
+1. 상호배제(Mutual exclusion) : 자원은 한 번에 한 프로세스만이 사용할 수 있어야 한다.
+2. 점유대기(Hold and wait) : 최소한 하나의 자원을 점유하고 있으면서 다른 프로세스에 할당되어 사용하고 있는 자원을 추가로 점유하기 위해 대기하는 프로세스가 있어야 한다.
+3. 비선점(No preemption) : 다른 프로세스에 할당된 자원은 사용이 끝날 때까지 강제로 빼앗을 수 없어야 한다.
+4. 순환대기(Circular wait) : 프로세스의 집합(P0, P1, ..., Pn)에서 P0는 P1이 점유한 자원을 대기하고 P1은 P2가 점유한 자원을 대기하고 ... Pn-1은 Pn이 점유한 자원을 대기하며 Pn은 P0가 점유한 자원을 요구해야 한다.
+
+#### wait() & notify()
+- 동기화를 하게 되면 하나의 작업을 하나의 쓰레드로만 처리하기 때문에 작업 효율이 떨어진다. 이때 동기화의 효율을 높이기 위해서 wait(), notify()를 사용한다.
+
+
+메서드 | 설명
+---- | ----
+void wait() <br/> void wait(long timeout) <br/> void wait(long timeout, int nanos) | 객체의 lock을 풀고 쓰레드를 해당 객체의 waiting pool에 넣는다.
+void notify() | waiting pool에서 대기 중인 쓰레드 하나를 깨운다.
+void notifyAll() | waiting pool에서 대기 중인 모든 쓰레드를 깨운다.
+
+- wait(), notify()는 Object 클래스에 정의되어 있으며, 동기화 블록 내에서만 사용할 수 있다.
+- 동기화된 임계 코드 영역의 작업을 수행하다가 작업을 더 이상 진행할 상황이 아니면, 일단 wait()을 호출하여 쓰레드가 lock을 반납하고 기다리게 한다.
+- 다른 쓰레드가 lock을 얻어서 해당 객체에 대한 작업을 수행한다.
+- 나중에 작업을 진행할 수 있는 상황이 되면 notify()를 호출하여 작업을 중단했던 쓰레드가 다시 lock을 얻어 작업을 진행할 수 있게 된다.
+
+  
+```java
+  public class Account {
+    private int balance = 1000;
+
+    public synchronized void withdraw(int money) {
+      while (balance < money) {
+        try {
+          wait();
+        } catch (InterruptedException e) {
+        }
+      }
+      balance -= money;
+    }
+
+    public synchronized void deposit(int money) {
+      balance += money;
+      notify();
+    }
+  }
+```  
+
+- 잔고가 모자라서 출금을 할 수 없는 경우, 다른 쓰레드가 입금 할 수 있도록 wait() 메서드를 호출하여 객체에 대한 lock을 풀고 waiting pool 에서 기다린다.
+- deposit을 수행하는 쓰레드는 해당 객체의 lock을 얻어 잔고를 채우고 notify() 메서드를 호출하여 waiting pool 에서 대기중인 쓰레드에게 다시 작업을 수행하라고 통보한다.
+- 대기중이던 쓰레드는 다시 락을 얻어 인출 로직을 수행한다.
+
