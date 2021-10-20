@@ -278,9 +278,8 @@ public class Thread implements Runnable {
 - 쓰레드의 우선 순위를 높이면 더 많은 실행 시간과 실행 기회를 부여받을 수 있다. 주의할 점은 이것이 반드시 보장되지 않는다.
 - 쓰레드의 작업할당은 OS의 스케쥴링 정책과 JVM의 구현에 따라 다르기 때문에 코드에서 우선순위를 지정하는 것은 단지 희망사항일 뿐, 실제 작업은 설정한 우선 순위와 다르게 진행할 수 있다.
 
-## 동기화(Synchronization)
 
-#### synchronized
+## 동기화(Synchronization)
 - 멀티 쓰레드 프로세스에서는 여러 프로세스가 메모리를 공유하기 때문에 한 쓰레드가 작업하던 부분을 다른 쓰레드가 간섭하는 문제가 생길 수 있다.
 - 어떤 쓰레드가 진행 중인 작업을 다른 쓰레드가 간섭하지 못하도록 하는 작업을 동기화라고 한다.
 - 동기화를 하려면 다른 쓰레드가 간섭해서는 안 되는 부분을 synchronized 키워드를 사용하여 임계영역(critical section)으로 설정해 주어야 한다.
@@ -306,7 +305,7 @@ public class Thread implements Runnable {
 - 참조변수는 락을 걸고자 하는 객체를 참조하는 것이어야 한다.
 - 이 영역으로 들어가면서부터 쓰레드는 지정된 객체의 lock을 얻게되고 블록을 벗어나면 lock을 반납한다.
 
-#### lock
+## lock
 - lock은 일종의 자물쇠 개념으로 모든 객체는 lock을 하나식 가지고 있다.
 - 해당 객체의 lock을 가지고 있는 쓰레드만 임계영역의 코드를 수행할 수 있다.
 - 한 객체의 lock은 하나밖에 없기 때문에 다른 쓰레드들은 lock을 얻을 때까지 기다리게 된다.
@@ -366,7 +365,7 @@ public class Thread implements Runnable {
   }
 ```  
 
-#### 교착상태(DeadLock)
+## 교착상태(DeadLock)
 - 교착상태는 한 자원을 여러 시스템이 사용하려고 할 때 발생
 
 <img src="https://cys779988.github.io/assets/img/java(8).png">
@@ -383,7 +382,7 @@ public class Thread implements Runnable {
 3. 비선점(No preemption) : 다른 프로세스에 할당된 자원은 사용이 끝날 때까지 강제로 빼앗을 수 없어야 한다.
 4. 순환대기(Circular wait) : 프로세스의 집합(P0, P1, ..., Pn)에서 P0는 P1이 점유한 자원을 대기하고 P1은 P2가 점유한 자원을 대기하고 ... Pn-1은 Pn이 점유한 자원을 대기하며 Pn은 P0가 점유한 자원을 요구해야 한다.
 
-#### wait() & notify()
+## wait() & notify()
 - 동기화를 하게 되면 하나의 작업을 하나의 쓰레드로만 처리하기 때문에 작업 효율이 떨어진다. 이때 동기화의 효율을 높이기 위해서 wait(), notify()를 사용한다.
 
 
@@ -424,15 +423,33 @@ void notifyAll() | waiting pool에서 대기 중인 모든 쓰레드를 깨운�
 - deposit을 수행하는 쓰레드는 해당 객체의 lock을 얻어 잔고를 채우고 notify() 메서드를 호출하여 waiting pool 에서 대기중인 쓰레드에게 다시 작업을 수행하라고 통보한다.
 - 대기중이던 쓰레드는 다시 락을 얻어 인출 로직을 수행한다.
 
-#### java.util.concurrent.locks
-- JDK 1.5부터 synchronized 외에 java.util.concurrent.locks 패키지의 Lock 클래스들을 사용하여 동기화를 구현
-- synchronized로 동기화를 하면 자동으로 lock이 걸리고 풀리지만 같은 메서드 내에서만 lock을 걸 수 있다는 불편함이 있다. 그럴 때 lock 클래스를 이용한다.
+## java.util.concurrent.locks
+- synchronized 블록을 사용했을 때와 동일한 메커니즘으로 동작
+- JDK 1.5부터 synchronized를 더욱 유연하고 세밀하게 처리하기 위해 사용하는 것이며 대체하는 목적이 아니다.
+- synchronized로 동기화를 하면 자동으로 lock이 걸리고 풀리지만 같은 메서드 내에서만 lock을 걸 수 있다는 불편함이 있다.
+
+
+#### Interface
 
   
 ```java
 
+// 공유 자원에 한번에 한 쓰레드만 read, write 
 public interface Lock {}
 
+// Lock에서 한단계 발전된 메커니즘을 제공하는 인터페이스. 공유자원에 여러개의 쓰레드가 read를 수행할 수 있지만, write는 한번에 한 쓰레드만 수행 가능
+public interface ReadWriteLock {}
+
+// Object 클래스의 monitor method인 wait(), notify(), notifyAll() 메서드를 대체한다.
+// wait -> await, notify -> signal, notifyAll -> signalAll
+public interface Condition {}
+
+```  
+
+#### Locks Interface 구현체
+
+  
+```java
 // 읽기에는 공유적이고, 쓰기에는 배타적인 lock
 public class ReentrantLock implements Lock, java.io.Serializable {}
 
@@ -446,3 +463,4 @@ public class StampedLock implements java.io.Serializable {}
 - ReentrantLock : 가장 일반적인 lock. 특정 조건에서 lock을 풀었다가 다시 lock을 걸 수 있다.
 - ReentrantReadWriteLock : 읽기를 위한 lock(ReadLock)과 쓰기를 위한 lock(WriteLock)을 제공. ReentrantLock은 무조건 lock이 있어야만 임계영역의 코드를 수행할 수 있지만, ReentrantReadWriteLock은 읽기 lock이 걸려 있으면, 다른 쓰레드가 읽기 lock을 중복해서 걸고 읽기를 수행할 수 있다. 그러나 읽기 lock이 걸린 상태에서 쓰기 lock은 허용되지않는다. 반대의 경우도 동일하다.
 - StampedLock : lock을 걸거나 해지할 때 Stamp(Long 타입 정수)를 사용하며 ReentrantReadWriteLock에 optimistic reading lock이 추가된 형태. 읽기 lock이 걸려 있으면 쓰기 lock을 얻기 위해서는 읽기 lock이 풀릴 때까지 기다려야 하는데 비해 optimistic reading lock은 쓰기 lock에 의해 바로 풀린다.
+
