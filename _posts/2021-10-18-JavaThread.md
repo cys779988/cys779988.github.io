@@ -452,6 +452,19 @@ true
 222
 ```  
 
+## Volatile
+- Java 변수를 Main Memory에 저장하겠다는 것을 명시하는 것
+- 매번 변수의 값을 Read할 때마다 CPU cache에 저장된 값이 아닌 Main Memory에서 읽고 변수의 값 Write할 때마다 Main Memory에 작성
+
+<img src="https://cys779988.github.io/assets/img/java(9).png">
+
+- volatile 변수를 사용하고 있는 않는 MultiThread 애플리케이션은 작업을 수행하는 동안 성능 향상을 위해서 Main Memory에서 읽은 변수를 CPU cache에 저장하게 된다.
+- 만약 Multi Thread 환경에서 Thread가 변수 값을 읽어올 때 각각의 CPU Cache에 저장된 값이 다르면 변수 값 불일치 문제가 발생하게 된다.
+- Multi Thread 환경에서 하나의 Thread만 read & write 하고 나머지 Thread가 read하는 상황에서 사용
+- volatile는 변수의 read와 write를 Main Memory에서 진행하게 되는데 CPU Cache보다 Main Memory가 비용이 더 크기 때문에 변수 값 일치를 보장해야 하는 경우에 volatile을 사용해야한다.
+
+
+
 ## 교착상태(DeadLock)
 - 교착상태는 한 자원을 여러 시스템이 사용하려고 할 때 발생
 
@@ -551,3 +564,59 @@ public class StampedLock implements java.io.Serializable {}
 - ReentrantReadWriteLock : 읽기를 위한 lock(ReadLock)과 쓰기를 위한 lock(WriteLock)을 제공. ReentrantLock은 무조건 lock이 있어야만 임계영역의 코드를 수행할 수 있지만, ReentrantReadWriteLock은 읽기 lock이 걸려 있으면, 다른 쓰레드가 읽기 lock을 중복해서 걸고 읽기를 수행할 수 있다. 그러나 읽기 lock이 걸린 상태에서 쓰기 lock은 허용되지않는다. 반대의 경우도 동일하다.
 - StampedLock : lock을 걸거나 해지할 때 Stamp(Long 타입 정수)를 사용하며 ReentrantReadWriteLock에 optimistic reading lock이 추가된 형태. 읽기 lock이 걸려 있으면 쓰기 lock을 얻기 위해서는 읽기 lock이 풀릴 때까지 기다려야 하는데 비해 optimistic reading lock은 쓰기 lock에 의해 바로 풀린다.
 
+
+  
+```
+  public class SharedData {
+    private int value;
+
+    public void increase() {
+      value += 1;
+    }
+
+    public void print() {
+      System.out.println(value);
+    }
+  }
+```  
+
+  
+```
+  public class LockSample {
+    public static void main(String[] args) {
+      final SharedData sharedData = new SharedData();
+      final Lock lock = new ReentrantLock();
+
+      for (int i = 0; i < 10; i++) {
+        new Thread(new LockRunnableSample(sharedData, lock)).start();
+      }
+    }
+  }
+
+  class LockRunnableSample implements Runnable {
+    private final SharedData sharedData;
+    private final Lock lock;
+
+    public LockRunnableSample(SharedData sharedData, Lock lock) {
+      this.sharedData = sharedData;
+      this.lock = lock;
+    }
+
+    @Override
+    public void run() {
+      lock.lock();
+      try {
+        for (int i = 0; i < 100; i++) {
+          sharedData.increase();
+        }
+        sharedData.print();
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        lock.unlock();
+      }
+    }
+  }
+```  
+
+#### synchronized 와 Lock
