@@ -454,6 +454,12 @@ true
 
 ## Volatile
 - Java 변수를 Main Memory에 저장하겠다는 것을 명시하는 것
+
+  
+```
+  public volatile int count = 0;
+```  
+
 - 매번 변수의 값을 Read할 때마다 CPU cache에 저장된 값이 아닌 Main Memory에서 읽고 변수의 값 Write할 때마다 Main Memory에 작성
 
 <img src="https://cys779988.github.io/assets/img/java(9).png">
@@ -527,7 +533,7 @@ void notifyAll() | waiting pool에서 대기 중인 모든 쓰레드를 깨운�
 - synchronized 블록을 사용했을 때와 동일한 메커니즘으로 동작
 - JDK 1.5부터 synchronized를 더욱 유연하고 세밀하게 처리하기 위해 사용하는 것이며 대체하는 목적이 아니다.
 - synchronized로 동기화를 하면 자동으로 lock이 걸리고 풀리지만 같은 메서드 내에서만 lock을 걸 수 있다는 불편함이 있다.
-
+- Lock 은 lock(), unlock()으로 시작과 끝을 명시해서 임계영역을 여러 메서드에 나눠서 설정
 
 #### Interface
 
@@ -566,7 +572,7 @@ public class StampedLock implements java.io.Serializable {}
 
 
   
-```
+```java
   public class SharedData {
     private int value;
 
@@ -581,7 +587,7 @@ public class StampedLock implements java.io.Serializable {}
 ```  
 
   
-```
+```java
   public class LockSample {
     public static void main(String[] args) {
       final SharedData sharedData = new SharedData();
@@ -619,4 +625,27 @@ public class StampedLock implements java.io.Serializable {}
   }
 ```  
 
-#### synchronized 와 Lock
+## synchronized 와 Lock의 차이 fairness(공정성)
+
+- 모든 쓰레드가 자신의 작업을 수행할 기회를 공평하게 갖는 것
+- 공정한 방법에서는 Queue 안에서 쓰레드들이 무조건 순서를 지켜가며 lock을 확보
+- 불공정한 방법에서는 만약 특정 쓰레드에 lock이 필요한 순간 release가 발생하면 대기열을 건너뛰는 새치기가 발생한다.
+- 다른 쓰레드들에게 우선순위가 밀려 자원을 계속해서 할당받지 못하는 쓰레드가 존재하는 상황을 starvation(기아상태)라 부르는데 이 상황을 해결하기 위해 공정성이 필요하다.
+- synchronized 키워드는 공정성을 지원하지 않는다.
+- ReentrantLock은 생성자의 인자를 통해서 Fair/NonFair 설정을 할 수 있다. 
+
+  
+```java
+    public ReentrantLock() {
+        sync = new NonfairSync();
+    }
+
+    public ReentrantLock(boolean fair) {
+        sync = fair ? new FairSync() : new NonfairSync();
+    }
+```  
+
+- 공정한 lock을 사용할 경우 경쟁이 발생했을 때 가장 오랫동안 기다린 쓰레드에게 lock을 제공한다.
+- lock을 요청하는 시간 간격이 긴 경우가 아니라면, 쓰레드를 공정하게 관리하는 것보다 불공정하게 관리할 때 성능이 더 우수하다. 그래서 일반적으로 불공정 방식이 사용된다.
+
+
