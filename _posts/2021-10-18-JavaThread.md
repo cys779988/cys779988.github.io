@@ -365,6 +365,93 @@ public class Thread implements Runnable {
   }
 ```  
 
+## Atomic
+- Atomicity(원자성)의 개념으로 가장 작은 단위를 뜻한다.
+- 자바의 Atomic Type은 Wrapping 클래스의 일종으로 참조 타입과 원시 타입 두 종류의 변수에 모두 적용이 가능하다.
+- 사용시 내부적으로 CAS(Compare And Swap) 알고리즘을 사용해 lock 없이 동기화 처리를 할 수 있다.
+- Atomic Type 경우 volatile과 synchronized와 달리 java.util.concurrent.atomic 패키지에 정의된 클래스
+- CAS는 특정 메모리 위치와 주어진 위치의 value를 비교하여 다르면 대체하지 않는다.
+
+#### 주요 클래스
+
+  
+```java
+public class AtomicBoolean implements java.io.Serializable
+
+public class AtomicInteger extends Number implements java.io.Serializable
+
+public class AtomicLong extends Number implements java.io.Serializable
+
+public class AtomicIntegerArray implements java.io.Serializable
+
+```  
+
+#### 주요 메서드
+
+  
+```java
+
+    public final boolean get() {
+        return value != 0;
+    }
+    
+    public final void set(boolean newValue) {
+        value = newValue ? 1 : 0;
+    }
+    
+    public final boolean getAndSet(boolean newValue) {
+        boolean prev;
+        do {
+            prev = get();
+        } while (!compareAndSet(prev, newValue));
+        return prev;
+    }
+    
+    // 현재 값이 예상하는 값(expect)과 동일하면 값을 update 후 true 반환. 예상하는 값과 같지 않다면 update는 생략하고 false 반환
+    public final boolean compareAndSet(boolean expect, boolean update) {
+        int e = expect ? 1 : 0;
+        int u = update ? 1 : 0;
+        return unsafe.compareAndSwapInt(this, valueOffset, e, u);
+    }
+```  
+
+#### Compare-And-Swap(CAS)
+- 메모리 위치의 내용을 주어진 값과 비교하고 동일한 경우에만 해당 메모리 위치의 내용을 새로 주어진 값으로 수정
+- 현재 주어진 값(현재 쓰레드에서의 데이터)과 실제 데이터와 저장된 데이터를 비교해서 두 개가 일치할 때만 업데이트한다.(compareAndSet())
+- 즉, synchronized와 같이 임계영역에 같은 시점에 두개 이상의 쓰레드가 접근하려 하면 쓰레드 자체를 blocking 시키는 메커니즘이 아니다.
+
+  
+```java
+  public class DemoAtomicType {
+    public static void main(String[] args) {
+      AtomicLong atomicLong1 = new AtomicLong();
+      AtomicLong atomicLong2 = new AtomicLong();
+
+      long expect = 111;
+      long update = 222;
+
+      System.out.println(atomicLong1.compareAndSet(expect, update));
+      atomicLong2.set(222);
+
+      System.out.println(atomicLong2.compareAndSet(222, expect));
+
+      System.out.println(atomicLong2.compareAndSet(expect, update));
+
+      System.out.println(atomicLong1.get());
+      System.out.println(atomicLong2.get());
+    }
+  }
+```  
+
+  
+```
+false
+true
+true
+0
+222
+```  
+
 ## 교착상태(DeadLock)
 - 교착상태는 한 자원을 여러 시스템이 사용하려고 할 때 발생
 
