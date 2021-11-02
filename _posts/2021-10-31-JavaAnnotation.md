@@ -145,7 +145,7 @@ public class Test {
 @Retention(RetentionPolicy.RUNTIME)
 @interface TestAnnotation { }
 
-@MyAnnotation_04
+@TestAnnotation
 class ReflectionTestClass { }
 
 ```  
