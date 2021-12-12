@@ -139,4 +139,157 @@ public class BoundTypeTest <T extends Number>{
 -   ```<? extends Foo>```  와 같은 형태로 사용하고, 특정 클래스의 자식 클래스만을 인자로 받는다. 임의의 Foo 클래스를 상속받는 어떤 클래스가 와도 되지만 Foo 클래스에 정의된 기능만 사용가능하다.
 
 #### Lower Bounded WildCard
--   ```<? super 하위타입>```  와 같은 형태로 사용하고, Upper Bounded WildCard와 다르게 특정 클래스의 부모 클래스만을 인자로 받는다.
+-   ```<? super Foo>```  와 같은 형태로 사용하고, Upper Bounded WildCard와 다르게 특정 클래스의 부모 클래스만을 인자로 받는다.
+
+
+## Erasure
+- 컴파일러는 제네릭 타입을 이용해서 소스파일을 체크하고 필요한 곳에 형변환을 넣어준다.
+- 즉, 컴파일된 파일에는 제네릭 타입에 대한 정보가 없다. 이렇게 하는 주 목적은 하위 호환성에 있다.
+- 제네릭은 타입 파라미터에 primitive 타입을 사용하지 못하는데 그 이유는 타입 소거(type Erasure) 때문이다.
+
+  
+```java
+public class GenericTest() {
+    List<Integer> list = new ArrayList<>();
+}
+```  
+
+  
+```java
+public class GenericTest {
+
+  // compiled from: GenericTest.java
+
+  // access flags 0x0
+  // signature Ljava/util/List<Ljava/lang/Integer;>;
+  // declaration: list extends java.util.List<java.lang.Integer>
+  Ljava/util/List; list
+
+  // access flags 0x1
+  public <init>()V
+   L0
+    LINENUMBER 4 L0
+    ALOAD 0
+    INVOKESPECIAL java/lang/Object.<init> ()V
+   L1
+    LINENUMBER 5 L1
+    ALOAD 0
+    NEW java/util/ArrayList
+    DUP
+    INVOKESPECIAL java/util/ArrayList.<init> ()V
+    PUTFIELD GenericTest.list : Ljava/util/List;
+    RETURN
+   L2
+    LOCALVARIABLE this LGenericTest; L0 L2 0
+    MAXSTACK = 3
+    MAXLOCALS = 1
+}
+
+```  
+
+- 바이트 코드를 살펴보면 ArrayList가 생성될 때 타입정보가 나오지 않는다. 제네릭을 사용하지 않고 raw type으로 ArrayList를 생성해도 동일한 바이트 코드를 볼 수 있다.
+- 내부에서 타입 파라미터를 사용할 경우 Object 타입으로 취급하여 처리된다.
+- 제네릭 타입이 특정 타입으로 제한되어 있을 경우 해당 타입에 맞춰 컴파일시 타입 변경이 발생하고 타입 제한이 없을 경우 Object 타입으로 변경된다. 이를 타입소거(type Erasure)라 한다.
+- 이는 제네릭을 사용하더라도 하위 버전에서 동일하게 동작해야하기 때문에 하위 호환성을 지키기 위해 만들어졌다.
+- 원시 타입을 사용하지 못하는 것도 바로 이 기본 타입은 Object 클래스를 상속받고 있지 않기 때문이다. 그래서 기본 타입 자료형을 사용하기 위해서는 Wrapper 클래스를 사용해야 한다.
+
+#### Unbounded WildCard 타입소거
+
+  
+```java
+public class Node<T> {
+    private T data;
+    private Node<T> next;
+
+    public Node(T data, Node<T> next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public T getData() {
+        return data;
+    }
+}
+
+
+
+// 위 코드는 아래와 같다고 볼 수 있다.
+public class Node {
+    private Object data;
+    private Node next;
+
+    public Node(Object data, Node next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public Object getData() {
+        return data;
+    }
+}
+```  
+
+#### Bounded WildCard 타입소거
+
+  
+```java
+public class Node<T extends Comparable<T>> {
+    private T data;
+    private Node<T> next;
+
+    public Node(T data, Node<T> next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public T getData() {
+        return data;
+    }
+}
+
+
+
+// 위 코드는 아래와 같다고 볼 수 있다.
+public class Node {
+    private Object data;
+    private Comparable next;
+
+    public Node(Object data, Comparable next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public Object getData() {
+        return data;
+    }
+}
+```  
+
+
+#### 메서드 타입소거
+
+  
+```java
+public static <T> int count(T[] anArray, T elem) {
+    int cnt = 0;
+    for (T e : anArray) {
+        if (e.equals(elem)) {
+            cnt++;
+        }
+    }
+    return cnt;
+}
+
+
+
+// 위 코드는 아래와 같다고 볼 수 있다.
+public static int count(Object[] anArray, Object elem) {
+    int cnt = 0;
+    for (Object e : anArray) {
+        if (e.equals(elem)) {
+            cnt++;
+        }
+    }
+    return cnt;
+}
+```  
