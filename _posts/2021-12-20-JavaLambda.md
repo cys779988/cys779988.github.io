@@ -13,26 +13,21 @@ categories:
 
 ## 람다식과 익명 클래스
 
-#### 익명 클래스
 
   
 ```java
 
+// 익명 클래스
 new Object() {
   int max(int a, int b) {
     return a > b ? a : b;
   }
 }
-```  
 
-#### 람다식
-
-  
-```java
-
+// 람다식
 (int a, int b) -> a > b ? a : b
-
 ```  
+
 
 위의 익명 객체의 메서드를 호출하기 위해서는 익명 객체의 주소를 참조변수에 저장해야 된다.
 
@@ -58,8 +53,6 @@ DemoFunction func = new DemoFunction() {
 int big = func.max(7, 3);
 ```  
 
-DemoFunction 인터페이스 익명 객체를 람다식으로 변경할 수 있다.
-
   
 ```java
 DemoFunction func = (a, b) -> a > b ? a : b; // 익명 객체를 람다식으로 대체
@@ -73,13 +66,11 @@ int big = func.max(7, 3);  // 익명 객체 메소드 호출
 ## 함수형 인터페이스
 - 람다식을 다루기 위한 인터페이스로 하나의 추상 메서드만 존재해야한다.
 - static 메서드와 default 메서드의 개수에는 제약이 없다.
-- @FunctionalInterface 애노테이션을 정의여 컴파일 단계에서 함수형 인터페이스를 올바르게 정의하였는지 확인
+- @FunctionalInterface 애노테이션을 정의하면 컴파일 단계에서 추상메서드가 1개만 선언되었는지 확인할 수 있다.
 
-### 매개변수와 반환타입
-
-#### 함수형 인터페이스
   
 ```java
+// 함수형 인터페이스
 @FunctionalInterface
 interface DemoFunction {
   void testMethod();	
@@ -93,9 +84,9 @@ interface DemoFunction {
 }
 ```  
 
-#### 익명 내부 클래스 방식 정의
   
 ```java
+// 익명 내부 클래스 방식 정의
 public class Main {
   static void testMethod(DemoFunction f) {
     f.testMethod();
@@ -112,9 +103,9 @@ public class Main {
 }
 ```  
 
-#### 람다 형식 정의
   
 ```java
+// 람다 형식 정의
 public class Main {
   static void testMethod(DemoFunction f) {
     f.testMethod();
@@ -133,7 +124,22 @@ public class Main {
 }
 ```  
 
-### 람다식 타입과 형변환
+
+#### java.util.function 패키지
+
+
+함수형 인터페이스 | 메서드
+---- | ----
+java.lang.Runnable | void run()
+Supplier<T> | T get()
+Consumer<T> | void accept(T t)
+Function<T,R> | R apply(T t)
+Predicate<T> | boolean test(T t)
+UnaryOperator<T> | T apply(T t)
+
+
+
+#### 람다식 타입과 형변환
 람다식은 익명 객체이고 익명 객체는 타입이 없다. 따라서 대입 연산자의 양변의 타입을 일치시키기 위해 형변환이 필요하다.
 
   
@@ -201,6 +207,52 @@ Outer.this.val : 11
 - 반면, Inner 클래스와 Outer 클래스의 인스턴스 변수인 this.val과 Outer.this.val은 상수로 간주되지 않으므로 값을 변경할 수 있다.
 - 람다식에서 this는 내부적으로 생성되는 익명 객체의 참조가 아니라 람다식을 실행한 객체의 참조이다. 따라서 위의 코드에서 this는 중첩 객체 Inner를 가리킨다.
 
+## 메서드, 생성자 레퍼런스
+
+#### 메서드 참조
+- 람다식이 하나의 메서드만 호출하는 경우에는 메서드 참조를 통해 람다식을 간략하게 작성할 수 있다.
+
+  
+```java
+// 메서드
+Integer wrapper(String s) {
+  return Integer.parseInt(s);
+}
+
+// 람다식
+Function<String, Integer> f = s -> Integer.parseInt(s);
+
+// 메서드 참조
+Function<String, Integer> f = Integer::parseInt;
+
+```  
+
+- 메서드 참조에서 람다식 일부가 생략되었지만, 컴파일러는 생략된 부분을 우변의 parseInt 메서드의 선언부로부터 또는 좌변의 Function 인터페이스에 지정된 제네릭 타입으로부터 쉽게 알아낸다.
+- 이미 생성된 객체의 메서드를 람다식에서 사용한 경우에는 클래스 이름 대신 그 객체의 참조변수를 적는다.
+
+  
+종류 | 람다 | 메서드참조
+---- | ---- | ----
+static 메서드 참조 |   ```x -> ClassName.method(x)```   | ClassName::method
+인스턴스 메서드 참조 |   ```(obj,x) -> obj.method(x)```   | ClassName::method
+특정객체 인스턴스 메서드 참조 |   ```x -> obj.method(x)```   | obj::method
+  
+#### 생성자의 메서드 참조
+
+  
+```java
+
+// 람다식
+Supplier<DemoClass> s = () -> new DemoClass();
+Function<Integer, DemoClass> f = i -> new DemoClass(i);
+Function<Integer, int[]> f2 = x -> new int[x];
+
+// 메서드 참조
+Supplier<DemoClass> s = DemoClass::new;
+Function<Integer, DemoClass> f = DemoClass:new;
+Function<Integer, int[]> f2 = int[]::new;
+```  
+
 
 ## 람다식의 컴파일
 - 람다식은 컴파일 타임에는 객체를 생성하지 않는다. 다만 런타임에 JVM이 객체를 생성할 수 있도록 람다식을 invokedynamic으로 변환하여 '생성하기 위한 정보'를 만들어둔다.
@@ -228,16 +280,12 @@ Function<Integer, Integer> func = (a) -> offset * a;
 
 ## 람다식의 효율성
 
-- Stateless(Non Capturing) 람다 : free variable을 참조하지 않는 람다식
-- Stateful(Capturing) 람다 : free variable을 참조하는 람다식
-
-### Stateless 람다
-  
-#### 익명 클래스
+#### Stateless 람다(Non Capturing)
 
   
 ```java
 
+// 익명 클래스
 public void loopAnonymous() {
   myStream.forEach(new Consumer<Item> () {
     @Override
@@ -246,25 +294,20 @@ public void loopAnonymous() {
     }
   }
 }
-```  
 
-#### 람다식
-
-  
-```java
-
+// 람다식
 public void loopLambda() {
   myStream.forEach(item -> item.doSomething());
 }
-
 ```  
+
 
 - 익명클래스로 구현한 forEach문은 매 iteration마다 익명 클래스를 정의하고, 그 객체를 생성한다. 만일 myStream의 요소가 100만개라면, 100만개의 새로운 익명클래스가 생겨난다.
 - 람다식으로 구현된 forEach문은 단 한 개의 클래스만이 생겨난다. 람다식으로 생성된 클래스는 그 실행 메서드에서 단순히 본래 클래스의 private static method만 호출하기 때문에 구현 객체만 생성해도 무한하게 재사용할 수 있다.
 - 따라서 익명클래스에 비해 성능과 자원 면에서 훨씬 효율적이다.
 
 
-### Stateful 람다
+#### Stateful 람다(Capturing)
 
   
 ```java
@@ -283,10 +326,9 @@ public class Test {
 }
 ```  
 
-#### -Djdk.internal.lambda.dumpProxyClasses 옵션을 사용해 동적 클래스를 저장
-
   
 ```java
+// -Djdk.internal.lambda.dumpProxyClasses 옵션을 사용해 동적 클래스를 저장
 import java.lang.invoke.LambdaForm.Hidden;
 // $FF: synthetic class
 final class Test$$Lambda$1 implements Runnable {
