@@ -2,7 +2,7 @@
 title:  "HTTP Header"
 excerpt: HTTP 헤더
 categories:
-  - Java
+  - http
 ---
 
 ## 공통헤더
