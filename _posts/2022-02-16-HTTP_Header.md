@@ -2,7 +2,7 @@
 title:  "HTTP Header"
 excerpt: HTTP 헤더
 categories:
-  - http
+  - etc
 ---
 
 ## 공통헤더

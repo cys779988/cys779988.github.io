@@ -2,7 +2,7 @@
 title:  "HTTP Header"
 excerpt: HTTP 쿠키&캐시 헤더, X헤더
 categories:
-  - http
+  - etc
 ---
 
 ## 캐시
