@@ -265,6 +265,9 @@ compress_html:
   ignore:
     envs: development
 
+collections:
+  posts:
+    output: true
 
 # Defaults
 defaults:
